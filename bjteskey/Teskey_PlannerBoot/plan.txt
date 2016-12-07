@@ -1,0 +1,25 @@
+
+
+This program will use several arrays, but the two most important are neededNotTaken and myArr
+
+Step 1.
+myArr = get raw registration data
+
+neededNotTaken = figure out which classes are needed but not taken by handling user input
+
+Step 2.
+
+Plug neededNotTaken into two functions:
+
+getNeededRegisterable = most complex part of the program. Figure out which courses the user can take based on pre-requisites and
+availability in myArr. Those of which they can take are added to neededRegisterable array, those of which they can't are added to 
+neededNotRegisterable array. 
+
+getNeededNotRegisterable = We have already been able to determine most of the courses that the user cannot register for directly
+in the getNeededRegisterable function, but there will be more that the user cannot register for due to being full or just not 
+being offered. Thus, we need to determine the remaining courses the user cannot register for, and add those to the 
+neededNotRegisterable array.
+
+Step 3.
+
+Output neededRegisterable and neededNotRegisterable to the screen to aid in planning the user's schedule. 

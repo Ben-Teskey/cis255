@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Course Planner</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+	<script>
+			// For pseudocode, see plan.txt file located in this directory
+			
+			// Declare a bunch of arrays
+			var myArr = new Array();
+			var neededNotTaken = new Array();
+			var neededRegisterable = new Array();
+			var neededNotRegisterable = new Array();
+			
+			// Variable used to store whether the CIS Degree or CS Degree radio button is checked
+			var whichChecked;
+			
+			// This code was taken right from the example provided in this assignment
+			// It is used to get the possible registrations for us to display back to the user
+			function getCourses() {
+				var xmlhttp = new XMLHttpRequest();
+				var url = "https://api.svsu.edu/courses?prefix=CS";
+
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						myArr = JSON.parse(xmlhttp.responseText);
+						getNeededNotTaken();
+						// myFunction(myArr);
+					}
+				};
+				xmlhttp.open("GET", url, true);
+				xmlhttp.send();
+			}
+			
+			// Get the courses the user needs, but hasn't taken yet. This will be very important for finding
+			// which courses the user can register for
+			function getNeededNotTaken() {
+				
+				// Comma splice to store user input into arrays
+				var taken = (document.getElementById("coursesTaken").value).split(", ");
+				var needed = (document.getElementById("coursesRequired").value).split(", ");
+				
+				// Our critically important needed not taken array
+				neededNotTaken = [];
+				
+				// Loop through values in needed to find needed not taken
+				for (var i = 0; i < needed.length; i++) {
+				
+					if (taken.includes(needed[i]));
+					else neededNotTaken.push(needed[i]);
+					
+				}
+				
+				// Now we find the courses the user can or cannot register for
+				getNeededRegisterable(neededNotTaken);
+				getNeededNotRegisterable(neededNotTaken);
+				
+			}
+			
+			// This function is the longest and most complex part of the program. 
+			// It sorts through all of the items in myArray, and figures out which the user can register for
+			// and which they cannot.
+			function getNeededRegisterable(arr) {
+				
+				neededRegisterable = [];
+				
+				for(var i = 0; i < myArr.courses.length; i++){
+				
+					var course = myArr.courses[i].prefix + " " + myArr.courses[i].courseNumber;
+					
+					// Check if the course is needed, but not taken yet
+					if (arr.includes(course)) {
+						
+						// Check if CIS Major
+						if (whichChecked == 0){
+						
+							// Check which course is needed not taken, and whether the pre-requisites are needed not taken
+							if ((course == "CIS 424" && !arr.includes("CIS 422")) 
+							|| (course == "CIS 422" && !arr.includes("CIS 366") && !arr.includes("CIS 386"))
+							|| (course == "CIS 366" && !arr.includes("CS 245")) 
+							|| (course == "CIS 355" && !arr.includes("CIS 255") && !arr.includes("CS 216"))
+							|| (course == "CIS 311" && !arr.includes("CS 146") && !arr.includes("CS 216"))
+							|| (course == "CIS 333" && !arr.includes("CS 216"))
+							|| (course == "CIS 386" && !arr.includes("CS 216"))
+							|| (course == "CIS 301" && !arr.includes("CS 245") && !arr.includes("CS 146") && !arr.includes("CS 216"))
+							|| (course == "CIS 255" && !arr.includes("CS 116"))
+							|| (course == "CS 216" && !arr.includes("CS 116"))
+							|| (course == "CS 116" && !arr.includes("CS 105"))
+							|| (course == "CS 105")
+							|| (course == "CS 146")) neededRegisterable.push(myArr.courses[i]);
+							else neededNotRegisterable.push(myArr.courses[i]);
+						
+						}
+						
+						// Check if CS Major
+						else if (whichChecked == 1) {
+						
+							// Check which course is needed not taken, and whether the pre-requisites are needed not taken
+							if ((course == "CS 471" && !arr.includes("CS 421"))
+							|| (course == "CS 421" && !arr.includes("CIS 355") && !arr.includes("CIS 357") && !arr.includes("CS 411") && !arr.includes("CS 401"))
+							|| (course == "CS 446" && !arr.includes("CS 331"))
+							|| (course == "CS 401" && !arr.includes("CS 331"))
+							|| (course == "CS 451" && !arr.includes("CS 316"))
+							|| (course == "CS 461" && !arr.includes("CS 316"))
+							|| (course == "CIS 355" && !arr.includes("CIS 255") && !arr.includes("CS 216"))
+							|| (course == "CIS 357" && !arr.includes("CS 216"))
+							|| (course == "CS 411" && !arr.includes("CS 216"))
+							|| (course == "CS 331" && !arr.includes("CS 216"))
+							|| (course == "CS 316" && !arr.includes("CS 216"))
+							|| (course == "CS 245" && !arr.includes("CS 116"))
+							|| (course == "CIS 255" && !arr.includes("CS 116"))
+							|| (course == "CS 216" && !arr.includes("CS 116"))
+							|| (course == "CS 116" && !arr.includes("CS 105"))
+							|| (course == "CS 105")
+							|| (course == "CS 146")) neededRegisterable.push(myArr.courses[i]);
+							else neededNotRegisterable.push(myArr.courses[i]);
+							
+						}
+						
+					}
+				}
+				
+				// Pass to my function, which outputs all registration info
+				myFunction(neededRegisterable);
+			
+			}
+			
+			// Obviously, not having the pre-requisites is not the only way in which a course will be unavailable to 
+			// register. Thus, we need to find what other courses the user is missing.
+			function getNeededNotRegisterable(arr) {
+			
+				neededNotRegisterable = [];
+				
+				for(var i = 0; i < arr.length; i++) {
+					
+					for (var j = 0; j < neededRegisterable.length; j++){
+						
+						if ((neededRegisterable[j].prefix + " " + neededRegisterable[j].courseNumber).localeCompare(arr[i]) == 0) arr[i] = null;
+						
+					}
+					if (arr[i] == null);
+					else if (!neededNotRegisterable.includes(arr[i])) neededNotRegisterable.push(arr[i]);
+					
+				}
+				
+				// Pass to my function 2, which outputs just the courses the user is missing
+				myFunction2(neededNotRegisterable);
+			
+			}
+			
+			// Clicking the radio buttons will automatically deliver a list of required courses to the required courses
+			// input box for the user. 
+			function handleClick(myRadio) {
+				
+				if (myRadio == document.getElementById("CISCheckbox")){
+					whichChecked = 0;
+					document.getElementById("coursesRequired").value = "CS 105, CS 146, CS 116, CS 245, CIS 255, CS 216, CIS 301, CIS 311, CIS 333, CIS 386, CIS 366, CIS 355, CIS 422, CIS 424";
+					
+				}
+				
+				if (myRadio == document.getElementById("CSCheckbox")){
+					whichChecked = 1;
+					document.getElementById("coursesRequired").value = "CS 105, CS 146, CS 116, CS 245, CIS 255, CS 216, CIS 357, CIS 355, CS 411, CS 331, CS 316, CS 446, CS 401, CS 451, CS 461, CS 421, CS 471";
+				
+				}
+			}
+			
+			// This function is designed to output all registration info for courses the user can register for
+			function myFunction(arr) {
+				var out = "";
+				var i;
+				
+				document.getElementById("neededNotTaken").innerHTML = "";
+				
+				for(i = 0; i < arr.length; i++) {
+				
+					var newText 
+						= arr[i].prefix + " " 
+						+ arr[i].courseNumber + " " 
+						+ arr[i].term + " " 
+						+ arr[i].meetingTimes[0].days + " " 
+						+ arr[i].meetingTimes[0].startTime + " " 
+						+ arr[i].meetingTimes[0].instructor; 
+					
+					// Append a paragraph tag for each course
+					document.getElementById("neededNotTaken").innerHTML += "<p>" + newText + "</p>";
+					
+				}
+			}
+			
+			// This function is designed to output all courses the user cannot register for, but is required to take. 
+			// Obviously, because they cannot register for these courses, it would be unhelpful to spit out all 
+			// available registration info. 
+			
+			function myFunction2(arr) {
+			
+				document.getElementById("neededTaken").innerHTML = "";
+				
+				for(var i = 0; i < arr.length; i++) {
+				
+					document.getElementById("neededTaken").innerHTML += "<p>" + arr[i] + "</p>";
+					
+				}
+				
+				
+				
+			}
+			
+		</script>
+
+</head>
+
+<body>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('img/home-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h1>A Course Planner</h1>
+                        <hr class="small">
+                        <span class="subheading">Will Make Your Dreams Come True</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+	<!-- Form to get necessary user course info -->
+	<center><form action="javascript: getCourses();">
+		<input type="radio" name="degree" onclick="javascript: handleClick(this);" id="CISCheckbox" /> CIS Degree
+		<input type="radio" name="degree" onclick="javascript: handleClick(this);" id="CSCheckbox" /> CS Degree
+		<br \>
+		Courses already taken: <input type="textarea"id="coursesTaken" /> 
+		<br \>
+		Courses required: <input type="textarea"id="coursesRequired" /> 
+		<br \>
+		<input type="submit" value="Submit">
+	</form> <!-- End Form -->
+		
+	<!-- Output courses needed and available to register -->
+	<h3>Needed, Available to Register</h3>
+	<div id="neededNotTaken">
+	</div>
+	<!-- Output courses needed, but not available to register -->
+	<h3>Needed, Not Available to Register</h3>
+	<div id="neededTaken"></center>
+	
+    <!-- jQuery -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contact_me.js"></script>
+
+    <!-- Theme JavaScript -->
+    <script src="js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
